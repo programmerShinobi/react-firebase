@@ -3,7 +3,7 @@ import blue from "@mui/material/colors/blue";
 
 const theme = createTheme({
 
-    pallete: {
+    palette: {
         primary: blue
     }
 

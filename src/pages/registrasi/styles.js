@@ -1,13 +1,8 @@
-import { StyledEngineProvider } from '@mui/material/styles';
+import theme from "../../config/theme";
 
-const useStyles = () => {
-    return (
-        <StyledEngineProvider>
-            {{
-                blue: '#2196f3'
-            }}
-        </StyledEngineProvider>
-    );
-};
+const useStyles = {
+    blue: theme.palette.primary[500]
+}
 
 export default useStyles;
+
