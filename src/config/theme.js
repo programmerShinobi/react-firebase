@@ -4,7 +4,10 @@ import blue from "@mui/material/colors/blue";
 const theme = createTheme({
 
     palette: {
-        primary: blue
+        primary: {
+            main: blue[500],
+            contrastText: 'white',
+        }
     }
 
 });
