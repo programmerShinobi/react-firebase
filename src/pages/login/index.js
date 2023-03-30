@@ -182,7 +182,10 @@ function Login() {
                         </Grid>
                     </Grid>
                     <Typography style={styles.label}>
-                        Belum punya akun?&nbsp;
+                        <Link style={styles.labelLink} to="/lupa-password">
+                            Lupa Password?
+                        </Link><hr />
+                        Belum punya Akun?&nbsp;
                         <Link disabled={isSubmitting} to="/registrasi" style={styles.labelLink}>Registrasi</Link>
                     </Typography>
                 </form>
