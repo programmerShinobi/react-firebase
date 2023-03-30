@@ -97,7 +97,7 @@ function Login() {
                             newError.email = 'Email telah diblokir';
                             break;
                         default:
-                            newError.email = 'Terjadi kesalahan silahkan coba lagi error : ' + e;
+                            newError.email = 'Terjadi kesalahan silahkan coba lagi, error : ' + e;
                             break;
                     }
                     setError(newError);
