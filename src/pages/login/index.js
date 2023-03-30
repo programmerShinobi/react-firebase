@@ -55,7 +55,6 @@ function Login() {
 
     const validate = () => {
         const newError = { ...error };
-
         if (!form.email) {
             newError.email = 'Email wajib diisi';
         } else if (!isEmail(form.email)) {
@@ -66,7 +65,6 @@ function Login() {
             newError.password = 'Kata sandi minimal harus 8 karakter dan mengandung setidaknya satu huruf kecil, satu huruf besar, satu angka, dan satu simbol';
         }
         return newError;
-
     }
 
     const handleSubmit = e => {
@@ -87,19 +85,19 @@ function Login() {
                     const newError = {};
                     switch (e.code) {
                         case 'auth/user-not-found':
-                            newError.email = 'Email belum terdatar'
+                            newError.email = 'Email belum terdatar';
                             break;
                         case 'auth/invalid-email':
-                            newError.email = 'Email tidak valid'
+                            newError.email = 'Email tidak valid';
                             break;
                         case 'auth/wrong-password':
-                            newError.password = 'Password salah'
+                            newError.password = 'Password salah';
                             break;
                         case 'auth/user-disabled':
-                            newError.email = 'Email tidak aktif'
+                            newError.email = 'Email telah diblokir';
                             break;
                         default:
-                            newError.email = 'Terjadi kesalahan silahkan coba lagi error : ' + e
+                            newError.email = 'Terjadi kesalahan silahkan coba lagi error : ' + e;
                             break;
                     }
                     setError(newError);
