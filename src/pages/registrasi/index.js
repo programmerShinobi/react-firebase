@@ -105,7 +105,7 @@ function Registrasi() {
                             newError.email = 'Metode email dan password tidak didukung';
                             break;
                         default:
-                            newError.email = 'Terjadi kesalahan silahkan coba lagi' + e;
+                            newError.email = 'Terjadi kesalahan silahkan coba lagi, error : ' + e;
                             break;
                     }
                     setError(newError);
