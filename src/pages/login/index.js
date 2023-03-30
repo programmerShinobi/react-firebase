@@ -17,7 +17,8 @@ import { useFirebase } from '../../components/FirebaseProvider';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import AppLoading from '../../components/AppLoading';
 
-function Login() {
+function Login(props) {
+    const { location } = props;
     const styles = useStyles.props.children;
 
     const [form, setForm] = useState({
@@ -116,7 +117,10 @@ function Login() {
     }
 
     if (firebase.user) {
-        return (<Redirect to='/' />)
+        const redirectTo = location.state && location.state.from && location.state.from.pathname
+            ? location.state.from.pathname
+            : '/';
+        return (<Redirect to={redirectTo} />)
     }
 
     return (
