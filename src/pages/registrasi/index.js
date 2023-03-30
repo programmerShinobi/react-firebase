@@ -58,7 +58,6 @@ function Registrasi() {
 
     const validate = () => {
         const newError = { ...error };
-
         if (!form.email) {
             newError.email = 'Email wajib diisi';
         } else if (!isEmail(form.email)) {
@@ -73,7 +72,6 @@ function Registrasi() {
             newError.ulangi_password = 'Password tidak sama';
         }
         return newError;
-
     }
 
     const handleSubmit = e => {
@@ -95,19 +93,19 @@ function Registrasi() {
                     const newError = {};
                     switch (e.code) {
                         case 'auth/email-already-in-use':
-                            newError.email = 'Email sudah terdaftar'
+                            newError.email = 'Email sudah terdaftar';
                             break;
                         case 'auth/invalid-email':
-                            newError.email = 'Email tidak valid'
+                            newError.email = 'Email tidak valid';
                             break;
                         case 'auth/weak-password':
-                            newError.password = 'Password lemah'
+                            newError.password = 'Password lemah';
                             break;
                         case 'auth/operation-not-allowed':
-                            newError.email = 'Metode email dan password tidak didukung'
+                            newError.email = 'Metode email dan password tidak didukung';
                             break;
                         default:
-                            newError.email = 'Terjadi kesalahan silahkan coba lagi' + e
+                            newError.email = 'Terjadi kesalahan silahkan coba lagi' + e;
                             break;
                     }
                     setError(newError);
