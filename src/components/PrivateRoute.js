@@ -1,5 +1,6 @@
 import React from "react";
 import { Route, Redirect } from "react-router-dom";
+// firebase provider
 import { useFirebase } from "./FirebaseProvider";
 
 function PrivateRoute({ component: Component, ...restProps }) {
@@ -8,7 +9,7 @@ function PrivateRoute({ component: Component, ...restProps }) {
         <Route
             {...restProps}
             render={props => {
-                return firebase.user
+                return firebase.auth.currentUser
                     ?
                     <Component {...props} />
                     :

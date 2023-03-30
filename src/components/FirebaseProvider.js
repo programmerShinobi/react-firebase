@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, signOut } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
@@ -26,6 +26,7 @@ function FirebaseProvider(props) {
     return (
         <FirebaseContext.Provider value={{
             auth,
+            signOut,
             firestore,
             storage,
             user,
