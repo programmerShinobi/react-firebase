@@ -33,10 +33,7 @@ const useStyles = (
             }
         }
     </StyledEngineProvider>
-)
-
-
-
+);
 
 export default useStyles;
 
