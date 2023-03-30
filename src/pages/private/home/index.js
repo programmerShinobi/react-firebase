@@ -18,6 +18,7 @@ function Home() {
                         })
                 }
                 color="error"
+                variant="contained"
             >
                 Sign Out
             </Button>
