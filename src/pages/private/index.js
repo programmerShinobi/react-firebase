@@ -26,10 +26,11 @@ import Pengaturan from "./pengaturan";
 import Produk from "./produk";
 import Transaksi from "./transaksi";
 import Home from "./home";
-import { AppBar, Drawer, mdTheme } from './styles';
+import { AppBar, Drawer } from './styles';
 import { useFirebase } from '../../components/FirebaseProvider';
 import { signOut } from 'firebase/auth';
 import { Settings } from '@mui/icons-material';
+import theme from '../../config/theme';
 
 function Copyright(props) {
     return (
@@ -62,7 +63,7 @@ function PrivateContent() {
     }
 
     return (
-        <ThemeProvider theme={mdTheme}>
+        <ThemeProvider theme={theme}>
             <Box sx={{ display: 'flex' }}>
                 <AppBar position="absolute" open={open}>
                     <Toolbar
@@ -165,7 +166,6 @@ function PrivateContent() {
                         <Route
                             path='/pengaturan'
                             children={({ match, history }) => {
-                                console.info(match);
                                 return (
                                     <ListItem
                                         button
