@@ -46,7 +46,7 @@ function Copyright(props) {
 }
 
 function PrivateContent() {
-    const [open, setOpen] = React.useState(true);
+    const [open, setOpen] = React.useState(false);
     const toggleDrawer = () => {
         setOpen(!open);
     };
