@@ -99,7 +99,7 @@ function Registrasi() {
                             newError.email = 'Email tidak valid';
                             break;
                         case 'auth/weak-password':
-                            newError.password = 'Password lemah';
+                            newError.password = 'Password terlalu lemah';
                             break;
                         case 'auth/operation-not-allowed':
                             newError.email = 'Metode email dan password tidak didukung';
