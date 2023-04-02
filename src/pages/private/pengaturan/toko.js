@@ -68,6 +68,16 @@ function Toko() {
         }
     }
 
+    const handleReset = (e) => {
+        e.preventDefault();
+        setForm({
+            nama: '',
+            alamat: '',
+            telepon: '',
+            website: '',
+        })
+    }
+
     const styles = useStyles.props.children
 
     return (
@@ -138,6 +148,7 @@ function Toko() {
                             variant="contained"
                             type="reset"
                             color="error"
+                            onClick={handleReset}
                             disabled={isSubmitting}
                         >
                             Reset
