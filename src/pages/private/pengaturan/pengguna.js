@@ -5,15 +5,14 @@ import { updateProfile, updateEmail, sendEmailVerification, updatePassword } fro
 import { useSnackbar } from "notistack";
 import isEmail from "validator/lib/isEmail";
 import useStyles from "./styles/pengguna";
-import Box from "@mui/material/Box/Box";
-import Button from "@mui/material/Button/Button";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography/Typography";
 import isStrongPassword from "validator/lib/isStrongPassword";
 import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-
 
 function Pengguna() {
     const firebase = useFirebase();
@@ -189,7 +188,6 @@ function Pengguna() {
                 helperText={error.displayName}
                 error={error.displayName ? true : false}
             />
-
             <TextField
                 variant="standard"
                 id="email"
@@ -220,35 +218,47 @@ function Pengguna() {
                     </Button>
             }
 
-            <TextField
-                variant="standard"
-                id="password"
-                name="password"
-                type={showPassword ? 'text' : 'password'}
-                label="Password Baru"
-                margin="normal"
-                inputProps={{
-                    ref: passwordRef,
-                    onBlur: savePassword
-                }}
-                InputProps={{
-                    endAdornment: (
-                        <InputAdornment position="end">
-                            <IconButton
-                                aria-label="toggle password visibility"
-                                onClick={() => setShowPassword(!showPassword)}
-                                onMouseDown={handleMouseDownPassword}
-                            >
-                                {showPassword ? <VisibilityOff /> : <Visibility />}
-                            </IconButton>
-                        </InputAdornment>
-                    ),
-                }}
-                disabled={isSubmitting}
-                helperText={error.password}
-                error={error.password ? true : false}
-                autoComplete="new-password"
-            />
+            <form>
+                <TextField
+                    fullWidth
+                    variant="standard"
+                    id="password"
+                    name="password"
+                    type={showPassword ? 'text' : 'password'}
+                    label="Password Baru"
+                    margin="normal"
+                    inputProps={{
+                        ref: passwordRef,
+                        onBlur: savePassword
+                    }}
+                    InputProps={{
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <IconButton
+                                    aria-label="toggle password visibility"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    onMouseDown={handleMouseDownPassword}
+                                >
+                                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                                </IconButton>
+                            </InputAdornment>
+                        ),
+                    }}
+                    disabled={isSubmitting}
+                    helperText={error.password}
+                    error={error.password ? true : false}
+                    autoComplete="new-password"
+                />
+                <Button
+                    fullWidth
+                    variant="contained"
+                    type="reset"
+                    color="error"
+                    disabled={isSubmitting}
+                >
+                    Reset Password
+                </Button>
+            </form>
 
         </Box>
     );

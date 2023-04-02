@@ -1,3 +1,4 @@
+import theme from "../../../../config/theme";
 import { StyledEngineProvider } from "@mui/material";
 
 const useStyles = (
