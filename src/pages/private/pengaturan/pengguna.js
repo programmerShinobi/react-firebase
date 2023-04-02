@@ -1,11 +1,13 @@
 import React, { useRef, useState } from "react";
 import TextField from "@mui/material/TextField";
 import { useFirebase } from "../../../components/FirebaseProvider";
-import { updateProfile, updateEmail } from "firebase/auth";
+import { updateProfile, updateEmail, sendEmailVerification } from "firebase/auth";
 import { useSnackbar } from "notistack";
 import isEmail from "validator/lib/isEmail";
 import useStyles from "./styles/pengguna";
 import Box from "@mui/material/Box/Box";
+import Button from "@mui/material/Button/Button";
+import Typography from "@mui/material/Typography/Typography";
 
 function Pengguna() {
     const firebase = useFirebase();
@@ -94,7 +96,22 @@ function Pengguna() {
         }
     }
 
+    const actionCodeSettings = {
+        url: `${window.location.origin}/login`
+    };
 
+    const sendEmail = async (e) => {
+        setIsSubmitting(true);
+        await sendEmailVerification(firebase.auth.currentUser, actionCodeSettings)
+            .then(() => {
+                setIsSubmitting(false);
+                enqueueSnackbar(`Email verifikasi telah dikirim ke ${emailRef.current.value}`, { variant: 'success' });
+            })
+            .catch((e) => {
+                setIsSubmitting(false);
+                enqueueSnackbar(`Email verifikasi gagal silahkan coba lagi, ${e}`)
+            })
+    };
 
     const styles = useStyles.props.children;
     return (
@@ -130,6 +147,19 @@ function Pengguna() {
                 helperText={error.email}
                 error={error.email ? true : false}
             />
+
+            {
+                firebase.auth.currentUser.emailVerified
+                    ? <Typography variant="subtitle1" color="primary">Email sudah terverifikasi</Typography>
+                    : <Button
+                        onClick={sendEmail}
+                        disabled={isSubmitting}
+                        variant="outlined"
+                        color="primary"
+                    >
+                        Kirim email verifikasi
+                    </Button>
+            }
         </Box>
     );
 }
