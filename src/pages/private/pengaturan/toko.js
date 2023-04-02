@@ -138,7 +138,7 @@ function Toko() {
                             variant="contained"
                             type="reset"
                             color="error"
-
+                            disabled={isSubmitting}
                         >
                             Reset
                         </Button>
