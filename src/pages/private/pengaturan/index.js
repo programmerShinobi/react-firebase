@@ -12,7 +12,7 @@ import useStyles from "./styles";
 function Pengaturan(props) {
   const { location, history } = props;
   const handleChangeTab = (event, value) => {
-    history.push(value)
+    history.push(value);
   }
   const styles = useStyles.props.children;
   return (
