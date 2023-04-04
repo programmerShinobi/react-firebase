@@ -12,7 +12,7 @@ import useStyles from "./styles/toko";
 import isURL from "validator/lib/isURL";
 import { doc, setDoc } from "firebase/firestore";
 import { useSnackbar } from "notistack";
-import { useDocument } from "react-firebase-hooks/firestore"
+import { useDocument } from "react-firebase-hooks/firestore";
 
 function Toko() {
     const firebase = useFirebase();
@@ -104,12 +104,11 @@ function Toko() {
         }
     }
 
-    const styles = useStyles.props.children
-
     if (loading) {
         return (<h1>Loading..</h1>)
     }
 
+    const styles = useStyles.props.children;
     return (
         <Box style={styles.pengaturanToko}>
             <form onSubmit={handleSubmit} noValidate>
