@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useFirebase } from "../../../components/FirebaseProvider";
 
 // Material-UI
 import TextField from "@mui/material/TextField";
@@ -9,8 +10,15 @@ import Grid from "@mui/material/Grid";
 // Custom Styles
 import useStyles from "./styles/toko";
 import isURL from "validator/lib/isURL";
+import { doc, setDoc } from "firebase/firestore";
+import { useSnackbar } from "notistack";
+import { useDocument } from "react-firebase-hooks/firestore"
 
 function Toko() {
+    const firebase = useFirebase();
+
+    const tokoDoc = doc(firebase.firestore, `toko/${firebase.user.uid}`);
+    const [snapshot, loading] = useDocument(tokoDoc);
 
     const [form, setForm] = useState({
         nama: '',
@@ -27,6 +35,15 @@ function Toko() {
     });
 
     const [isSubmitting, setIsSubmitting] = useState(false)
+
+    useEffect(() => {
+
+        if (snapshot) {
+            setForm(snapshot.data());
+        }
+    }, [snapshot]);
+
+    const { enqueueSnackbar } = useSnackbar();
 
     const handleChange = (e) => {
         setForm({
@@ -59,26 +76,39 @@ function Toko() {
         return newError;
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const findErrors = validate();
 
         if (Object.values(findErrors).some(err => err !== '')) {
             setError(findErrors);
+        } else {
+            setIsSubmitting(true);
+            await setDoc(tokoDoc, form, { merge: true })
+                .then(() => {
+                    setIsSubmitting(false);
+                    enqueueSnackbar('Data toko berhasil disimpan', { variant: 'success' });
+                })
+                .catch((e) => {
+                    setIsSubmitting(false);
+                    enqueueSnackbar('Data toko gagal disimpan, ' + e.message, { variant: 'error' });
+                });
         }
     }
 
     const handleReset = (e) => {
         e.preventDefault();
-        setForm({
-            nama: '',
-            alamat: '',
-            telepon: '',
-            website: '',
-        })
+
+        if (snapshot) {
+            setForm(snapshot.data());
+        }
     }
 
     const styles = useStyles.props.children
+
+    if (loading) {
+        return (<h1>Loading..</h1>)
+    }
 
     return (
         <Box style={styles.pengaturanToko}>
@@ -96,7 +126,6 @@ function Toko() {
                     helperText={error.nama}
                     error={error.nama ? true : false}
                     disabled={isSubmitting}
-
                 />
                 <TextField
                     required
