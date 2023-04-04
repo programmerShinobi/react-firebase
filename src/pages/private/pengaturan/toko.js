@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
+
+// react-router
+import { Prompt } from "react-router-dom";
+
+// firebase
 import { useFirebase } from "../../../components/FirebaseProvider";
+import { useDocument } from "react-firebase-hooks/firestore";
+import { doc, setDoc } from "firebase/firestore";
 
 // Material-UI
 import TextField from "@mui/material/TextField";
@@ -10,9 +17,10 @@ import Grid from "@mui/material/Grid";
 // Custom Styles
 import useStyles from "./styles/toko";
 import isURL from "validator/lib/isURL";
-import { doc, setDoc } from "firebase/firestore";
 import { useSnackbar } from "notistack";
-import { useDocument } from "react-firebase-hooks/firestore";
+import AppPageLoading from "../../../components/AppPageLoading";
+
+
 
 function Toko() {
     const firebase = useFirebase();
@@ -35,6 +43,7 @@ function Toko() {
     });
 
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [isSomethingChange, setSomeThingChange] = useState(false);
 
     useEffect(() => {
 
@@ -50,6 +59,12 @@ function Toko() {
             ...form,
             [e.target.name]: e.target.value
         });
+
+        setError({
+            [e.target.name]: ''
+        });
+
+        setSomeThingChange(true);
     }
 
     const validate = () => {
@@ -87,10 +102,12 @@ function Toko() {
             await setDoc(tokoDoc, form, { merge: true })
                 .then(() => {
                     setIsSubmitting(false);
+                    setSomeThingChange(false);
                     enqueueSnackbar('Data toko berhasil disimpan', { variant: 'success' });
                 })
                 .catch((e) => {
                     setIsSubmitting(false);
+                    setSomeThingChange(false);
                     enqueueSnackbar('Data toko gagal disimpan, ' + e.message, { variant: 'error' });
                 });
         }
@@ -105,7 +122,7 @@ function Toko() {
     }
 
     if (loading) {
-        return (<h1>Loading..</h1>)
+        return (<AppPageLoading />)
     }
 
     const styles = useStyles.props.children;
@@ -187,13 +204,17 @@ function Toko() {
                             variant="contained"
                             type="submit"
                             color="primary"
-                            disabled={isSubmitting}
+                            disabled={isSubmitting || !isSomethingChange}
                         >
-                            Sumbit
+                            Simpan
                         </Button>
                     </Grid>
                 </Grid>
             </form>
+            <Prompt
+                when={isSomethingChange}
+                message="Terdapat perubahan data yang belum disimpan, apakah Anda yakin ingin meninggalkan halaman ini?"
+            />
         </Box>
     );
 }
