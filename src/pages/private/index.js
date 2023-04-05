@@ -77,7 +77,7 @@ function PrivateContent() {
                             aria-label="open drawer"
                             onClick={toggleDrawer}
                             sx={{
-                                marginRight: '36px',
+                                marginRight: '24px',
                                 ...(open && { display: 'none' }),
                             }}
                         >
