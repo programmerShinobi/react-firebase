@@ -14,7 +14,6 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 
-
 function AddDialog({ history, open, handleClose }) {
     const [nama, setNama] = useState('');
     const [error, setError] = useState('');
