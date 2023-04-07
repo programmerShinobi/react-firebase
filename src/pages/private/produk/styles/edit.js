@@ -19,7 +19,7 @@ const useStyles = (
                 previewFotoProduk: {
                     textAlign: 'center',
                     width: '100%',
-                    height: '350px',
+                    height: 'auto',
                     'border-radius': '5px'
                 },
             }

@@ -170,7 +170,7 @@ function EditProduk({ match }) {
                     (snapshot) => {
                         // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
                         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        if (progress) {
+                        if (progress == 100) {
                             setSubmitting(false);
                             setSomethingChange(false);
                             enqueueSnackbar('Foto produk berhasil disimpan', { variant: 'success' });
@@ -195,9 +195,9 @@ function EditProduk({ match }) {
                             foto: e.message
                         }));
                     },
-                    async () => {
+                    () => {
                         // Upload completed successfully, now we can get the download URL
-                        const fotoUrl = await getDownloadURL(uploadTask.snapshot.ref)
+                        getDownloadURL(uploadTask.snapshot.ref)
                             .then((downloadURL) => {
                                 console.info('File available at', downloadURL);
                                 setForm(currentForm => ({
@@ -219,62 +219,6 @@ function EditProduk({ match }) {
             }
 
             reader.readAsDataURL(file);
-
-
-            // const storageRef = ref(firebase.storage, `toko/${firebase.user.uid}/produk/${match.params.produkId}/${file.name}`);
-            // const uploadTask = uploadBytesResumable(storageRef, file);
-            // // Listen for state changes, errors, and completion of the upload.
-            // uploadTask.on('state_changed',
-            //     (snapshot) => {
-            //         // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-            //         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            //         if (progress) {
-            //             setSubmitting(false);
-            //             setSomethingChange(false);
-            //             enqueueSnackbar('Foto produk berhasil disimpan', { variant: 'success' });
-            //         }
-            //         console.info('Upload is ' + progress + '% done');
-            //         switch (snapshot.state) {
-            //             case 'paused':
-            //                 console.info('Upload is paused');
-            //                 break;
-            //             case 'running':
-            //                 console.info('Upload is running');
-            //                 break;
-            //             default:
-            //                 break;
-            //         }
-            //     },
-            //     (e) => {
-            //         setSubmitting(false);
-            //         setSomethingChange(false);
-            //         setError(error => ({
-            //             error,
-            //             foto: e.message
-            //         }));
-            //     },
-            //     () => {
-            //         // Upload completed successfully, now we can get the download URL
-            //         getDownloadURL(uploadTask.snapshot.ref)
-            //             .then((downloadURL) => {
-            //                 console.info('File available at', downloadURL);
-            //                 setForm(currentForm => ({
-            //                     ...currentForm,
-            //                     foto: downloadURL
-            //                 }));
-            //             })
-            //             .catch((e) => {
-            //                 setSubmitting(false);
-            //                 setSomethingChange(false);
-            //                 setError(error => ({
-            //                     ...error,
-            //                     foto: e.message,
-            //                 }));
-            //             });
-            //     }
-            // );
-
-
 
         }
     }
