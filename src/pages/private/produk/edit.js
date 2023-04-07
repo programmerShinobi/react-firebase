@@ -122,7 +122,7 @@ function EditProduk({ match }) {
 
             setError(error => ({
                 ...error,
-                foto: `Tipe file tidak didukung: ${file.type}`,
+                foto: `Tipe file tidak didukung: ${file?.type}`,
             }));
         } if (file?.size >= 512000) {
             setError(error => ({
@@ -130,35 +130,14 @@ function EditProduk({ match }) {
                 foto: `Ukuran file terlalu besar > 500KB`
             }));
         } else {
-
-            const reader = new FileReader();
-
-            reader.onabort = () => {
-
-                setError(error => ({
-                    ...error,
-                    foto: `Proses pembacaan file dibatalkan`
-                }))
-            }
-
-            reader.onerror = () => {
-
-                setError(error => ({
-                    ...error,
-                    foto: 'File tidak bisa dibaca'
-                }))
-            }
-
-            reader.onload = async () => {
-
+            if (file) {
                 setError(error => ({
                     error,
                     foto: ""
                 }));
                 setSubmitting(true);
                 setSomethingChange(true);
-
-                const fotoExt = file.name.substring(file.name.lastIndexOf('.'));
+                const fotoExt = file.name.substring(file?.name.lastIndexOf('.'));
                 const fotoRef = `${match.params.produkId}${fotoExt}`;
                 const fotoSnapshot = produkStorageRef._location.path_ + fotoRef;
 
@@ -216,9 +195,6 @@ function EditProduk({ match }) {
                     }
                 );
             }
-
-            reader.readAsDataURL(file);
-
         }
     }
 
