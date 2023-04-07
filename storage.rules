@@ -1,0 +1,7 @@
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /toko/{uid}/produk/{produkId}/{filename} {
+      allow read, write: if request.auth.uid == uid;
+    }
+  }
+}
