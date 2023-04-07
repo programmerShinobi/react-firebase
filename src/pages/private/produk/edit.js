@@ -4,17 +4,19 @@ import { useSnackbar } from "notistack";
 
 // Firebase
 import { useFirebase } from "../../../components/FirebaseProvider";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { doc, setDoc } from "firebase/firestore";
+import { useDocument } from "react-firebase-hooks/firestore";
 
 // Material-UI
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
-import { collection, doc, setDoc, updateDoc } from "firebase/firestore";
-import { useDocument } from "react-firebase-hooks/firestore";
 import AppPageLoading from "../../../components/AppPageLoading";
 
 // Custom Styles
+import useStyles from "./styles/edit";
 
 function EditProduk({ match }) {
     const [form, setForm] = useState({
@@ -22,7 +24,8 @@ function EditProduk({ match }) {
         sku: '',
         harga: 0,
         stok: 0,
-        deskripsi: ''
+        deskripsi: '',
+        foto: '',
     });
 
     const [error, setError] = useState({
@@ -31,6 +34,7 @@ function EditProduk({ match }) {
         harga: '',
         stok: '',
         deskripsi: '',
+        foto: '',
     });
 
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -49,6 +53,8 @@ function EditProduk({ match }) {
     const firebase = useFirebase();
 
     const produkDoc = doc(firebase.firestore, `toko/${firebase.user.uid}/produk/${match.params.produkId}`);
+
+    const produkRef = ref(firebase.storage, `toko/${firebase.user.uid}/produk/${match.params.produkId}`);
 
     const [snapshot, loading] = useDocument(produkDoc);
 
@@ -105,14 +111,88 @@ function EditProduk({ match }) {
         }
     }
 
+    const handleUploadFile = (e) => {
+        const file = e.target.files && e.target.files[0];
+        setError(error => ({
+            ...error,
+            foto: '',
+        }));
+        if (!['image/png', 'image/jpeg'].includes(file?.type)) {
+
+            setError(error => ({
+                ...error,
+                foto: `Tipe file tidak didukung: ${file.type}`,
+            }));
+        } if (file?.size >= 512000) {
+            setError(error => ({
+                error,
+                foto: `Ukuran file terlalu besar > 500KB`
+            }));
+        } else {
+            setError(error => ({
+                error,
+                foto: ""
+            }));
+            setIsSubmitting(true);
+            setSomeThingChange(true);
+
+            const storageRef = ref(firebase.storage, `toko/${firebase.user.uid}/produk/${match.params.produkId}/${file.name}`);
+
+            const uploadTask = uploadBytesResumable(storageRef, file);
+
+            // Listen for state changes, errors, and completion of the upload.
+            uploadTask.on('state_changed',
+                (snapshot) => {
+                    // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    if (progress) {
+                        setIsSubmitting(false);
+                        setSomeThingChange(false);
+                        enqueueSnackbar('Foto produk berhasil disimpan', { variant: 'success' });
+                    }
+                    console.info('Upload is ' + progress + '% done');
+                    switch (snapshot.state) {
+                        case 'paused':
+                            console.log('Upload is paused');
+                            break;
+                        case 'running':
+                            console.log('Upload is running');
+                            break;
+                        default:
+                            break;
+                    }
+                },
+                (e) => {
+                    setIsSubmitting(false);
+                    setSomeThingChange(false);
+                    setError(error => ({
+                        error,
+                        foto: e.message
+                    }));
+                },
+                () => {
+                    // Upload completed successfully, now we can get the download URL
+                    getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                        console.log('File available at', downloadURL);
+                        setForm(currentForm => ({
+                            ...currentForm,
+                            foto: downloadURL
+                        }));
+                    });
+                }
+            );
+        }
+    }
+
     if (loading) {
         return (<AppPageLoading />)
     }
 
+    const styles = useStyles.props.children
     return (
         <div>
             <Typography variant="h5" component="h1">Edit Produk: {form.nama}</Typography>
-            <Grid container alignItems="center" justify="center">
+            <Grid container alignItems="center" justifyItems="center">
                 <Grid item xs={12} sm={6}>
                     <form
                         noValidate
@@ -193,9 +273,41 @@ function EditProduk({ match }) {
                     </form>
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                    <Typography>Upload Gambar</Typography>
+                    <div style={styles.uploadFotoProduk}>
+                        {form.foto && <img
+                            style={styles.previewFotoProduk}
+                            src={form.foto != '' ? form.foto : 'https://firebasestorage.googleapis.com/v0/b/aplikasi-penjualan-6fced.appspot.com/o/toko%2F1ExRhN5KPSepD34eJ3Ry76Vekfx1%2Fproduk%2F8ZFdCL95i042Hjjt4q0Q%2Fichiraku-ramen.jpg?alt=media&token=b4e92229-da33-4fbc-b54c-b17725e249af'}
+                            alt={`Foto Produk ${form.nama}`}
+                        />}
+                        <input
+                            style={styles.hideInputFile}
+                            type="file"
+                            id="upload-foto-produk"
+                            accept="image/jpeg, image/png"
+                            onChange={handleUploadFile}
+                        />
+                        <label
+                            htmlFor="upload-foto-produk"
+                        >
+                            <Button
+                                style={styles.button}
+                                disabled={isSubmitting}
+                                component="span"
+                                variant="outlined"
+                            >
+                                Upload Foto Produk
+                            </Button>
+                        </label>
+                        {error.foto && (
+                            <Typography
+                                color="error"
+                            >
+                                {error.foto}
+                            </Typography>
+                        )}
+                    </div>
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid style={styles.button} item xs={12} sm={6}>
                     <Button
                         fullWidth
                         form="form-produk"
