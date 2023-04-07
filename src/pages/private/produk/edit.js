@@ -173,7 +173,6 @@ function EditProduk({ match }) {
                         if (progress == 100) {
                             setSubmitting(false);
                             setSomethingChange(false);
-                            enqueueSnackbar('Foto produk berhasil disimpan', { variant: 'success' });
                         }
                         console.info('Upload is ' + progress + '% done');
                         switch (snapshot.state) {
