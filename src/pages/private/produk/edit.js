@@ -49,6 +49,8 @@ function EditProduk({ match }) {
         setError({
             [e.target.name]: ''
         });
+
+        setSomethingChange(true);
     }
 
     const firebase = useFirebase();
@@ -56,6 +58,8 @@ function EditProduk({ match }) {
     const produkDoc = doc(firebase.firestore, `toko/${firebase.user.uid}/produk/${match.params.produkId}`);
 
     const produkStorageRef = ref(firebase.storage, `toko/${firebase.user.uid}/produk/${match.params.produkId}`);
+
+    const [uploadTask, setUploadTask] = useState(null);
 
     const [snapshot, loading] = useDocument(produkDoc);
 
@@ -84,9 +88,9 @@ function EditProduk({ match }) {
             newError.stok = "Stok Produk wajib diisi atau tidak boleh \"0\"";
         }
 
-        // if (!form.foto) {
-        //     newError.foto = "Foto wajib diunggah";
-        // }
+        if (!form.foto) {
+            newError.foto = "Foto Produk wajib diunggah";
+        }
 
         return newError;
     }
@@ -102,24 +106,89 @@ function EditProduk({ match }) {
         } else {
             setSubmitting(true);
             setSomethingChange(true);
-            await setDoc(produkDoc, form, { merge: true })
-                .then(() => {
-                    setSubmitting(false);
-                    setSomethingChange(false);
-                    enqueueSnackbar('Data produk berhasil disimpan', { variant: 'success' });
-                })
-                .catch((e) => {
-                    setSubmitting(false);
-                    setSomethingChange(false);
-                    enqueueSnackbar('Data toko gagal disimpan, ' + e.message, { variant: 'error' });
-                });
+            if (uploadTask) {
+                // Listen for state changes, errors, and completion of the upload.
+                await uploadTask.on('state_changed',
+                    (snapshot) => {
+                        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        console.info('Upload is ' + progress + '% done');
+                        switch (snapshot.state) {
+                            case 'paused':
+                                console.info('Upload is paused');
+                                break;
+                            case 'running':
+                                console.info('Upload is running');
+                                break;
+                            default:
+                                break;
+                        }
+                    },
+                    (e) => {
+                        setSubmitting(false);
+                        setSomethingChange(false);
+                        setError(error => ({
+                            error,
+                            foto: e.message
+                        }));
+                    },
+                    () => {
+                        // Upload completed successfully, now we can get the download URL
+                        getDownloadURL(uploadTask.snapshot.ref)
+                            .then((downloadURL) => {
+                                console.info('File available at', downloadURL);
+                                setForm(currentForm => ({
+                                    ...currentForm,
+                                    foto: downloadURL.toString()
+                                }));
+                                setDoc(produkDoc, form, { merge: true })
+                                    .then(() => {
+                                        setSubmitting(false);
+                                        setSomethingChange(false);
+                                        enqueueSnackbar('Data produk berhasil disimpan', { variant: 'success' });
+                                    })
+                                    .catch((e) => {
+                                        setSubmitting(false);
+                                        setSomethingChange(false);
+                                        enqueueSnackbar('Data toko gagal disimpan, ' + e.message, { variant: 'error' });
+                                    });
+                                setSubmitting(false);
+                                setSomethingChange(false);
+                            })
+                            .catch((e) => {
+                                setSubmitting(false);
+                                setSomethingChange(false);
+                                setError(error => ({
+                                    ...error,
+                                    foto: e.message,
+                                }));
+                            });
+                    }
+                );
+            } else {
+                await setDoc(produkDoc, form, { merge: true })
+                    .then(() => {
+                        setSubmitting(false);
+                        setSomethingChange(false);
+                        enqueueSnackbar('Data produk berhasil disimpan', { variant: 'success' });
+                    })
+                    .catch((e) => {
+                        setSubmitting(false);
+                        setSomethingChange(false);
+                        enqueueSnackbar('Data toko gagal disimpan, ' + e.message, { variant: 'error' });
+                    });
+            }
         }
     }
 
-
     const handleUploadFile = (e) => {
         const file = e.target.files && e.target.files[0];
-        if (!['image/png', 'image/jpeg'].includes(file?.type)) {
+        if (!file) {
+            setError(error => ({
+                ...error,
+                foto: 'Foto Produk wajib diunggah',
+            }));
+        } else if (!['image/png', 'image/jpeg'].includes(file?.type)) {
             setError(error => ({
                 ...error,
                 foto: `Tipe file tidak didukung: ${file?.type}`,
@@ -130,66 +199,25 @@ function EditProduk({ match }) {
                 foto: `Ukuran file terlalu besar > 500KB`
             }));
         } else {
-            setSubmitting(true);
-            setSomethingChange(true);
-            const fotoExt = file.name.substring(file?.name.lastIndexOf('.'));
-            const fotoRef = `${match.params.produkId}${fotoExt}`;
-            const fotoSnapshot = produkStorageRef._location.path_ + fotoRef;
-
-            const storageRef = ref(firebase.storage, fotoSnapshot);
-
-            const uploadTask = uploadBytesResumable(storageRef, file);
-            // Listen for state changes, errors, and completion of the upload.
-            uploadTask.on('state_changed',
-                (snapshot) => {
-                    // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    console.info('Upload is ' + progress + '% done');
-                    switch (snapshot.state) {
-                        case 'paused':
-                            console.info('Upload is paused');
-                            break;
-                        case 'running':
-                            console.info('Upload is running');
-                            break;
-                        default:
-                            break;
-                    }
-                },
-                (e) => {
-                    setSubmitting(false);
-                    setSomethingChange(false);
-                    setError(error => ({
-                        error,
-                        foto: e.message
-                    }));
-                },
-                () => {
-                    // Upload completed successfully, now we can get the download URL
-                    getDownloadURL(uploadTask.snapshot.ref)
-                        .then((downloadURL) => {
-                            console.info('File available at', downloadURL);
-                            setForm(currentForm => ({
-                                ...currentForm,
-                                foto: downloadURL.toString()
-                            }));
-                            setError(error => ({
-                                error,
-                                foto: ''
-                            }));
-                            setSubmitting(false);
-                            setSomethingChange(false);
-                        })
-                        .catch((e) => {
-                            setSubmitting(false);
-                            setSomethingChange(false);
-                            setError(error => ({
-                                ...error,
-                                foto: e.message,
-                            }));
-                        });
-                }
-            );
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const url = event.target?.result
+                setForm(currentForm => ({
+                    ...currentForm,
+                    foto: url
+                }));
+                setError(error => ({
+                    error,
+                    foto: ''
+                }));
+                const fotoExt = file.name.substring(file?.name.lastIndexOf('.'));
+                const fotoRef = `${match.params.produkId}${fotoExt}`;
+                const fotoSnapshot = produkStorageRef._location.path_ + fotoRef;
+                const storageRef = ref(firebase.storage, fotoSnapshot);
+                setUploadTask(uploadBytesResumable(storageRef, file));
+                setSomethingChange(true);
+            }
+            reader.readAsDataURL(file);
         }
     }
 
@@ -323,7 +351,7 @@ function EditProduk({ match }) {
                         type="submit"
                         color="primary"
                         variant="contained"
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || !isSomethingChange}
                     >
                         Simpan
                     </Button>
