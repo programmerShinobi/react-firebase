@@ -217,6 +217,41 @@ function EditProduk({ match }) {
             <Typography variant="h5" component="h1">Edit Produk: {form.nama}</Typography>
             <Grid container alignItems="center" justifyItems="center">
                 <Grid item xs={12} sm={6}>
+                    <div style={styles.uploadFotoProduk}>
+                        {form.foto && <img
+                            style={styles.previewFotoProduk}
+                            src={form.foto}
+                            alt={`Foto Produk ${form.nama}`}
+                        />}
+                        <input
+                            style={styles.hideInputFile}
+                            type="file"
+                            id="upload-foto-produk"
+                            accept="image/jpeg, image/png"
+                            onChange={handleUploadFile}
+                        />
+                        <label
+                            htmlFor="upload-foto-produk"
+                        >
+                            <Button
+                                style={styles.button}
+                                disabled={isSubmitting}
+                                component="span"
+                                variant="outlined"
+                            >
+                                Upload Foto Produk
+                            </Button>
+                        </label>
+                        {error.foto && (
+                            <Typography
+                                color="error"
+                            >
+                                {error.foto}
+                            </Typography>
+                        )}
+                    </div>
+                </Grid>
+                <Grid item xs={12} sm={6}>
                     <form
                         noValidate
                         id="form-produk"
@@ -294,44 +329,8 @@ function EditProduk({ match }) {
                             error={error.deskripsi ? true : false}
                         />
                     </form>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                    <div style={styles.uploadFotoProduk}>
-                        {form.foto && <img
-                            style={styles.previewFotoProduk}
-                            src={form.foto}
-                            alt={`Foto Produk ${form.nama}`}
-                        />}
-                        <input
-                            style={styles.hideInputFile}
-                            type="file"
-                            id="upload-foto-produk"
-                            accept="image/jpeg, image/png"
-                            onChange={handleUploadFile}
-                        />
-                        <label
-                            htmlFor="upload-foto-produk"
-                        >
-                            <Button
-                                style={styles.button}
-                                disabled={isSubmitting}
-                                component="span"
-                                variant="outlined"
-                            >
-                                Upload Foto Produk
-                            </Button>
-                        </label>
-                        {error.foto && (
-                            <Typography
-                                color="error"
-                            >
-                                {error.foto}
-                            </Typography>
-                        )}
-                    </div>
-                </Grid>
-                <Grid style={styles.button} item xs={12} sm={6}>
                     <Button
+                        style={styles.button}
                         fullWidth
                         form="form-produk"
                         type="submit"
@@ -342,6 +341,19 @@ function EditProduk({ match }) {
                         Simpan
                     </Button>
                 </Grid>
+
+                {/* <Grid style={styles.button} item xs={12} sm={6}>
+                    <Button
+                        fullWidth
+                        form="form-produk"
+                        type="submit"
+                        color="primary"
+                        variant="contained"
+                        disabled={isSubmitting || !isSomethingChange}
+                    >
+                        Simpan
+                    </Button>
+                </Grid> */}
             </Grid>
             <Prompt
                 when={isSomethingChange}
