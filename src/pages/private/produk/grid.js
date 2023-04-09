@@ -83,6 +83,7 @@ function GridProduk() {
             <Typography
                 variant="h5"
                 component="h1"
+                paragraph
             >
                 Daftar Produk
             </Typography>
@@ -121,7 +122,9 @@ function GridProduk() {
                                             />
                                         </div>
                                     )}
-                                    <CardContent>
+                                    <CardContent
+                                        style={styles.produkDetails}
+                                    >
                                         <Typography
                                             variant="h5"
                                             noWrap
@@ -140,7 +143,9 @@ function GridProduk() {
                                         </Typography>
 
                                     </CardContent>
-                                    <CardActions>
+                                    <CardActions
+                                        style={styles.produkActions}
+                                    >
                                         <IconButton
                                             component={Link}
                                             to={`/produk/edit/${produkDoc.id}`}
