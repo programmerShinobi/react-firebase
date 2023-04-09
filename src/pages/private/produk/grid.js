@@ -11,6 +11,9 @@ import CardContent from "@mui/material/CardContent";
 import CardActions from "@mui/material/CardActions"
 import Typography from "@mui/material/Typography";
 import ImageIcon from "@mui/icons-material/Image";
+import IconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 // page
 import AddDialog from "./add";
@@ -18,12 +21,17 @@ import AppPageLoading from "../../../components/AppPageLoading";
 
 // firebase
 import { useFirebase } from "../../../components/FirebaseProvider";
-import { collection } from "firebase/firestore";
+import { collection, deleteDoc, doc } from "firebase/firestore";
 import { useCollection } from "react-firebase-hooks/firestore"
 import { currency } from "../../../utils/formatter";
+import Link from "react-router-dom/Link";
+import { deleteObject, ref } from "firebase/storage";
+import { useSnackbar } from "notistack";
 
 function GridProduk() {
     const [openAddDialog, setOpenAddDialog] = useState(false);
+
+    const { enqueueSnackbar } = useSnackbar();
 
     const firebase = useFirebase();
 
@@ -37,7 +45,19 @@ function GridProduk() {
         setProdukItems(snapshot?.docs);
     }, [snapshot]);
 
-    console.info(produkItems);
+    const handleDelete = (produkDoc) => async (e) => {
+        if (window.confirm('Anda yakin ingin menghapus produk ini?')) {
+
+            const produk = await doc(firebase.firestore, `toko/${firebase.user.uid}/produk/${produkDoc.id}`);
+            await deleteDoc(produk);
+
+            const fotoUrl = await produkDoc.data().foto;
+            if (fotoUrl) {
+                const produkStorageRef = await ref(firebase.storage, fotoUrl);
+                await deleteObject(produkStorageRef.fullPath)
+            }
+        }
+    }
 
     if (loading) {
         return (<AppPageLoading />);
@@ -106,6 +126,19 @@ function GridProduk() {
                                         </Typography>
 
                                     </CardContent>
+                                    <CardActions>
+                                        <IconButton
+                                            component={Link}
+                                            to={`/produk/edit/${produkDoc.id}`}
+                                        >
+                                            <EditIcon />
+                                        </IconButton>
+                                        <IconButton
+                                            onClick={handleDelete(produkDoc)}
+                                        >
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </CardActions>
                                 </Card>
                             </Grid>
                         );
