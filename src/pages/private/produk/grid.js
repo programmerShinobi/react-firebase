@@ -26,6 +26,8 @@ import { useCollection } from "react-firebase-hooks/firestore"
 import { currency } from "../../../utils/formatter";
 import Link from "react-router-dom/Link";
 import { deleteObject, ref } from "firebase/storage";
+
+// notification
 import { useSnackbar } from "notistack";
 
 function GridProduk() {
@@ -49,13 +51,25 @@ function GridProduk() {
         if (window.confirm('Anda yakin ingin menghapus produk ini?')) {
 
             const produk = await doc(firebase.firestore, `toko/${firebase.user.uid}/produk/${produkDoc.id}`);
-            await deleteDoc(produk);
+            await deleteDoc(produk).then(async () => {
+                const fotoUrl = produkDoc.data().foto;
+                if (fotoUrl) {
+                    const produkStorageRef = await ref(firebase.storage, fotoUrl);
+                    console.info(produkStorageRef);
+                    await deleteObject(ref(firebase.storage, produkStorageRef.fullPath))
+                        .then(() => {
+                            enqueueSnackbar('Data produk berhasil dihapus', { variant: 'success' });
+                        }).catch((error) => {
+                            enqueueSnackbar('Data produk gagal dihapus, ' + error.message, { variant: 'error' });
+                        });
+                } else {
+                    enqueueSnackbar('Data produk berhasil dihapus', { variant: 'success' });
+                }
+            }).catch((error) => {
+                enqueueSnackbar('Data produk gagal dihapus, ' + error.message, { variant: 'error' });
+            });
 
-            const fotoUrl = await produkDoc.data().foto;
-            if (fotoUrl) {
-                const produkStorageRef = await ref(firebase.storage, fotoUrl);
-                await deleteObject(produkStorageRef.fullPath)
-            }
+
         }
     }
 
