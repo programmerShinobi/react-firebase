@@ -44,7 +44,9 @@ function GridProduk() {
     const [produkItems, setProdukItems] = useState([]);
 
     useEffect(() => {
-        setProdukItems(snapshot?.docs);
+        if (snapshot) {
+            setProdukItems(snapshot?.docs);
+        }
     }, [snapshot]);
 
     const handleDelete = (produkDoc) => async (e) => {
