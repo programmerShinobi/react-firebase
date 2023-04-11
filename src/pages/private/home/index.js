@@ -20,6 +20,12 @@ import TextField from "@mui/material/TextField";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ImageIcon from "@mui/icons-material/Image";
 
+// page
+import AppPageLoading from "../../../components/AppPageLoading";
+
+// styles
+import useStyles from "./styles";
+
 function Home() {
     const firebase = useFirebase();
 
@@ -29,17 +35,30 @@ function Home() {
 
     const [produkItems, setProdukItems] = useState([]);
 
+    const [filterProduk, setFilterProduk] = useState('');
+
     useEffect(() => {
         if (snapshotProduk) {
-            setProdukItems(snapshotProduk?.docs);
+            setProdukItems(snapshotProduk?.docs.filter((produkDoc) => {
+                if (filterProduk) {
+                    return produkDoc.data().nama.toLowerCase().includes(filterProduk.toLowerCase())
+                }
+                return true;
+            }));
         }
-    }, [snapshotProduk])
+    }, [snapshotProduk, filterProduk])
 
+    if (loadingProduk) {
+        return (<AppPageLoading />);
+    }
+
+    const styles = useStyles.props.children;
     return (
         <>
             <Typography
                 variant="h5"
                 component="h1"
+                paragraph
             >
                 Buat Transaksi Baru
             </Typography>
@@ -49,6 +68,7 @@ function Home() {
                     xs={12}
                 >
                     <List
+                        style={styles.produkList}
                         component="nav"
                         subheader={(
                             <ListSubheader
@@ -59,6 +79,9 @@ function Home() {
                                     variant="standard"
                                     margin="normal"
                                     label="Cari produk"
+                                    onChange={(e) => {
+                                        setFilterProduk(e.target.value);
+                                    }}
                                 />
                             </ListSubheader>
                         )}
@@ -70,17 +93,20 @@ function Home() {
                                     <ListItem
                                         key={produkDoc.id}
                                         button
+                                        disabled={!produkData.stok}
                                     >
                                         {
                                             produkData.foto
                                                 ? <ListItemAvatar>
                                                     <Avatar
+                                                        style={styles.foto}
                                                         src={produkData.foto}
                                                         alt={produkData.nama}
                                                     />
                                                 </ListItemAvatar>
                                                 : <ListItemIcon>
                                                     <ImageIcon
+                                                        style={styles.fotoPlaceholder}
                                                         color="disabled"
                                                     />
                                                 </ListItemIcon>
