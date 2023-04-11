@@ -76,6 +76,7 @@ function Home() {
                             >
                                 <TextField
                                     fullWidth
+                                    autoFocus
                                     variant="standard"
                                     margin="normal"
                                     label="Cari produk"
