@@ -104,8 +104,11 @@ function Registrasi() {
                         case 'auth/operation-not-allowed':
                             newError.email = 'Metode email dan password tidak didukung';
                             break;
+                        case 'auth/internal-error':
+                            newError.email = 'Jaringan internet tidak stabil';
+                            break;
                         default:
-                            newError.email = 'Terjadi kesalahan silahkan coba lagi, error : ' + e;
+                            newError.email = 'Terjadi kesalahan silahkan coba lagi, ' + e.message;
                             break;
                     }
                     setError(newError);
