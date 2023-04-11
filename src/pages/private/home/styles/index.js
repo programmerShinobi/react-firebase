@@ -8,7 +8,8 @@ const useStyles = (
                 produkList: {
                     backgroundColor: theme.palette.background.paper,
                     maxHeight: 500,
-                    overflow: 'auto'
+                    overflow: 'auto',
+                    'border-radius': '5px'
                 },
                 foto: {
                     width: 40
@@ -20,7 +21,7 @@ const useStyles = (
                 },
                 inputJumlah: {
                     width: 35
-                }
+                },
             }
         }
     </StyledEngineProvider>

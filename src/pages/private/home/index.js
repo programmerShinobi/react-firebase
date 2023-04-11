@@ -147,9 +147,10 @@ function Home() {
                 Buat Transaksi Baru
             </Typography>
 
-            <Grid container>
+            <Grid container spacing={5}>
                 <Grid item
                     xs={12}
+                    md={8}
                 >
                     <Table>
                         <TableHead>
@@ -208,6 +209,7 @@ function Home() {
                 </Grid>
                 <Grid item
                     xs={12}
+                    md={4}
                 >
                     <List
                         style={styles.produkList}
