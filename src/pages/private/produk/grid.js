@@ -136,7 +136,7 @@ function GridProduk() {
                                         <Typography
                                             variant="subtitle1"
                                         >
-                                            Stok : {produkData.stok}
+                                            Stok : {produkData.stok ? produkData.stok : 0}
                                         </Typography>
                                         <Typography
                                             variant="subtitle1"
