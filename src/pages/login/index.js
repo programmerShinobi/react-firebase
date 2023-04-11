@@ -10,7 +10,6 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 // import react router dom
 import { Link, Redirect } from 'react-router-dom';
 import isEmail from 'validator/lib/isEmail';
-import isStrongPassword from 'validator/lib/isStrongPassword';
 
 // import firebase hook
 import { useFirebase } from '../../components/FirebaseProvider';
@@ -62,8 +61,6 @@ function Login(props) {
             newError.email = 'Email tidak valid';
         } else if (!form.password) {
             newError.password = 'Password wajib diisi';
-        } else if (!isStrongPassword(form.password)) {
-            newError.password = 'Kata sandi minimal harus 8 karakter dan mengandung setidaknya satu huruf kecil, satu huruf besar, satu angka, dan satu simbol';
         }
         return newError;
     }
