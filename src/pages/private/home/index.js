@@ -53,14 +53,15 @@ function Home() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSomethingChange, setIsSomeThingChange] = useState(false);
 
-    const [transaksi, setTransaksi] = useState({
+    const initialTransaksi = {
         no: '',
         tanggal: todayDateString,
         items: {
 
         },
         total: 0
-    })
+    }
+    const [transaksi, setTransaksi] = useState(initialTransaksi);
 
     useEffect(() => {
         if (snapshotProduk) {
@@ -160,22 +161,27 @@ function Home() {
     const simpanTransaksi = async (e) => {
         if (Object.keys(transaksi.items).length <= 0) {
             enqueueSnackbar('Tidak ada transaksi untuk disimpan', { variant: 'error' });
-        }
-
-        await addDoc(transaksiCol, {
-            ...transaksi,
-            timestamp: Date.now()
-        })
-            .then((result) => {
-                setIsSubmitting(false);
-                setIsSomeThingChange(false);
-                enqueueSnackbar('Transaksi berhasil disimpan', { variant: 'success' });
+        } else {
+            setIsSubmitting(true);
+            await addDoc(transaksiCol, {
+                ...transaksi,
+                timestamp: Date.now()
             })
-            .catch((e) => {
-                setIsSubmitting(false);
-                setIsSomeThingChange(false);
-                enqueueSnackbar(e.message, { variant: 'error' });
-            });
+                .then(() => {
+                    setIsSubmitting(false);
+                    setIsSomeThingChange(false);
+                    setTransaksi(transaksi => ({
+                        ...initialTransaksi,
+                        no: transaksi.no
+                    }));
+                    enqueueSnackbar('Transaksi berhasil disimpan', { variant: 'success' });
+                })
+                .catch((e) => {
+                    setIsSubmitting(false);
+                    setIsSomeThingChange(false);
+                    enqueueSnackbar(e.message, { variant: 'error' });
+                });
+        }
 
     }
 
@@ -204,6 +210,7 @@ function Home() {
                         InputProps={{
                             readOnly: true
                         }}
+                        disabled={isSubmitting}
                     />
                 </Grid>
                 <Grid item>
@@ -211,6 +218,7 @@ function Home() {
                         variant="contained"
                         color="primary"
                         onClick={simpanTransaksi}
+                        disabled={isSubmitting}
                     >
                         Simpan Transaksi
                     </Button>
@@ -245,6 +253,7 @@ function Home() {
                                                     style={styles.inputJumlah}
                                                     value={item.jumlah}
                                                     onChange={handleChangeJumlah(k)}
+                                                    disabled={isSubmitting}
                                                 />
                                             </TableCell>
                                             <TableCell>
@@ -296,6 +305,7 @@ function Home() {
                                     onChange={(e) => {
                                         setFilterProduk(e.target.value);
                                     }}
+                                    disabled={isSubmitting}
                                 />
                             </ListSubheader>
                         )}
@@ -307,7 +317,7 @@ function Home() {
                                     <ListItem
                                         key={produkDoc.id}
                                         button
-                                        disabled={!produkData.stok}
+                                        disabled={!produkData.stok || isSubmitting}
                                         onClick={addItem(produkDoc)}
                                     >
                                         {
