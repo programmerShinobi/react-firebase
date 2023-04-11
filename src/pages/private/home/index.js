@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 // firebase
 import { useFirebase } from "../../../components/FirebaseProvider";
-import { collection } from "firebase/firestore";
+import { addDoc, collection, query, where } from "firebase/firestore";
 import { useCollection } from "react-firebase-hooks/firestore";
 
 // material-ui
@@ -20,6 +20,7 @@ import TableRow from "@mui/material/TableRow";
 import TableHead from "@mui/material/TableHead";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
+import Button from "@mui/material/Button";
 
 // icon
 import ListItemIcon from "@mui/material/ListItemIcon";
@@ -32,19 +33,29 @@ import AppPageLoading from "../../../components/AppPageLoading";
 import useStyles from "./styles";
 import { useSnackbar } from "notistack";
 import { currency } from "../../../utils/formatter";
+import format from "date-fns/format";
 
 function Home() {
+
+    const todayDateString = format(new Date(), 'yyyy-MM-dd');
+
     const firebase = useFirebase();
 
     const produkCol = collection(firebase.firestore, `toko/${firebase.user.uid}/produk`);
-
     const [snapshotProduk, loadingProduk] = useCollection(produkCol);
-
     const [produkItems, setProdukItems] = useState([]);
-
     const [filterProduk, setFilterProduk] = useState('');
 
+    const transaksiCol = collection(firebase.firestore, `toko/${firebase.user.uid}/transaksi`);
+    const queryTransaksiCol = query(transaksiCol, where("tanggal", "==", todayDateString));
+    const [snapshotTransaksi, loadingTransaksi] = useCollection(queryTransaksiCol);
+
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSomethingChange, setIsSomeThingChange] = useState(false);
+
     const [transaksi, setTransaksi] = useState({
+        no: '',
+        tanggal: todayDateString,
         items: {
 
         },
@@ -60,7 +71,21 @@ function Home() {
                 return true;
             }));
         }
-    }, [snapshotProduk, filterProduk])
+    }, [snapshotProduk, filterProduk]);
+
+    useEffect(() => {
+        if (snapshotTransaksi) {
+            setTransaksi(transaksi => ({
+                ...transaksi,
+                no: `${transaksi.tanggal}/${snapshotTransaksi.docs.length + 1}`
+            }));
+        } else {
+            setTransaksi((transaksi) => ({
+                ...transaksi,
+                no: `${transaksi.tanggal}/1`
+            }));
+        }
+    }, [snapshotTransaksi]);
 
     const { enqueueSnackbar } = useSnackbar();
 
@@ -103,7 +128,7 @@ function Home() {
     const handleChangeJumlah = (k) => (e) => {
         let newItem = { ...transaksi.items[k] };
 
-        newItem.jumlah = parseInt(e.target.value) > 0 ? parseInt(e.target.value) : 1;
+        newItem.jumlah = parseInt(e.target.value)
         newItem.subtotal = newItem.harga * newItem.jumlah;
 
         const newItems = {
@@ -132,7 +157,29 @@ function Home() {
         }
     }
 
-    if (loadingProduk) {
+    const simpanTransaksi = async (e) => {
+        if (Object.keys(transaksi.items).length <= 0) {
+            enqueueSnackbar('Tidak ada transaksi untuk disimpan', { variant: 'error' });
+        }
+
+        await addDoc(transaksiCol, {
+            ...transaksi,
+            timestamp: Date.now()
+        })
+            .then((result) => {
+                setIsSubmitting(false);
+                setIsSomeThingChange(false);
+                enqueueSnackbar('Transaksi berhasil disimpan', { variant: 'success' });
+            })
+            .catch((e) => {
+                setIsSubmitting(false);
+                setIsSomeThingChange(false);
+                enqueueSnackbar(e.message, { variant: 'error' });
+            });
+
+    }
+
+    if (loadingProduk || loadingTransaksi) {
         return (<AppPageLoading />);
     }
 
@@ -147,6 +194,28 @@ function Home() {
                 Buat Transaksi Baru
             </Typography>
 
+            <Grid container spacing={5}>
+                <Grid item xs>
+                    <TextField
+                        variant="standard"
+                        size="small"
+                        label='No Transaksi'
+                        value={transaksi.no}
+                        InputProps={{
+                            readOnly: true
+                        }}
+                    />
+                </Grid>
+                <Grid item>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={simpanTransaksi}
+                    >
+                        Simpan Transaksi
+                    </Button>
+                </Grid>
+            </Grid>
             <Grid container spacing={5}>
                 <Grid item
                     xs={12}
