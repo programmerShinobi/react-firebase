@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 // firebase
 import { useFirebase } from "../../../components/FirebaseProvider";
-import { addDoc, collection, query, where } from "firebase/firestore";
+import { addDoc, collection, doc, query, runTransaction, where } from "firebase/firestore";
 import { useCollection } from "react-firebase-hooks/firestore";
 
 // material-ui
@@ -168,20 +168,42 @@ function Home() {
                 ...transaksi,
                 timestamp: Date.now()
             })
-                .then(() => {
+                .then(async () => {
                     setIsSubmitting(false);
                     setIsSomeThingChange(false);
                     setTransaksi(transaksi => ({
                         ...initialTransaksi,
                         no: transaksi.no
                     }));
-                    enqueueSnackbar('Transaksi berhasil disimpan', { variant: 'success' });
+                    const produkIDs = Object.keys(transaksi.items);
+                    return Promise.all(produkIDs.map(async (produkId) => {
+                        const produkRef = doc(firebase.firestore, `toko/${firebase.user.uid}/produk/${produkId}`);
+                        try {
+                            await runTransaction(firebase.firestore, async (transaction) => {
+                                const produkDoc = await transaction.get(produkRef);
+                                if (!produkDoc.exists()) {
+                                    throw "Produk tidak ada!";
+                                }
+
+                                let newStok = parseInt(produkDoc.data().stok) - parseInt(transaksi.items[produkId].jumlah);
+
+                                if (newStok < 0) {
+                                    newStok = 0;
+                                }
+                                transaction.update(produkRef, { stok: newStok });
+                            });
+                            enqueueSnackbar('Transaksi berhasil disimpan', { variant: 'success' });
+                        } catch (e) {
+                            enqueueSnackbar(e.message, { variant: 'error' });
+                        }
+                    }));
                 })
                 .catch((e) => {
                     setIsSubmitting(false);
                     setIsSomeThingChange(false);
                     enqueueSnackbar(e.message, { variant: 'error' });
                 });
+
         }
 
     }
