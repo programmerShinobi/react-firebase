@@ -18,6 +18,9 @@ const useStyles = (
                     alignSelf: 'center',
                     textAlign: 'center'
                 },
+                inputJumlah: {
+                    width: 35
+                }
             }
         }
     </StyledEngineProvider>
