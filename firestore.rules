@@ -8,6 +8,10 @@ service cloud.firestore {
       match /produk/{produkId}{
         allow read, write: if request.auth.uid == uid;
       }
+
+      match /transaksi/{produkId}{
+        allow read, write: if request.auth.uid == uid;
+      }
     }
   }
 }
