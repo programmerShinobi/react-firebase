@@ -25,6 +25,7 @@ import Button from "@mui/material/Button";
 // icon
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ImageIcon from "@mui/icons-material/Image";
+import SaveIcon from "@mui/icons-material/Save";
 
 // page
 import AppPageLoading from "../../../components/AppPageLoading";
@@ -243,6 +244,7 @@ function Home() {
                         onClick={simpanTransaksi}
                         disabled={isSubmitting}
                     >
+                        <SaveIcon style={styles.iconSimpanTransaksi} />
                         Simpan Transaksi
                     </Button>
                 </Grid>

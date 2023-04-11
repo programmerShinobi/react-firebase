@@ -22,6 +22,9 @@ const useStyles = (
                 inputJumlah: {
                     width: 35
                 },
+                iconSimpanTransaksi: {
+                    marginRight: theme.spacing(1)
+                }
             }
         }
     </StyledEngineProvider>
