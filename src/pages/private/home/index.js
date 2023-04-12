@@ -166,6 +166,7 @@ function Home() {
             return false;
         } else {
             setIsSubmitting(true);
+            setIsSomeThingChange(true);
             await addDoc(transaksiCol, {
                 ...transaksi,
                 timestamp: Date.now()
