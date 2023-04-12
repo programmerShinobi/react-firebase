@@ -35,6 +35,7 @@ import useStyles from "./styles";
 import { useSnackbar } from "notistack";
 import { currency } from "../../../utils/formatter";
 import format from "date-fns/format";
+import { Prompt } from "react-router-dom";
 
 function Home() {
 
@@ -176,6 +177,7 @@ function Home() {
                         ...initialTransaksi,
                         no: transaksi.no
                     }));
+                    enqueueSnackbar('Transaksi berhasil disimpan', { variant: 'success' });
                     const produkIDs = Object.keys(transaksi.items);
                     return Promise.all(produkIDs.map(async (produkId) => {
                         const produkRef = doc(firebase.firestore, `toko/${firebase.user.uid}/produk/${produkId}`);
@@ -187,13 +189,11 @@ function Home() {
                                 }
 
                                 let newStok = parseInt(produkDoc.data().stok) - parseInt(transaksi.items[produkId].jumlah);
-
                                 if (newStok < 0) {
                                     newStok = 0;
                                 }
                                 transaction.update(produkRef, { stok: newStok });
                             });
-                            enqueueSnackbar('Transaksi berhasil disimpan', { variant: 'success' });
                         } catch (e) {
                             enqueueSnackbar(e.message, { variant: 'error' });
                         }
@@ -204,7 +204,6 @@ function Home() {
                     setIsSomeThingChange(false);
                     enqueueSnackbar(e.message, { variant: 'error' });
                 });
-
         }
 
     }
@@ -374,6 +373,10 @@ function Home() {
                     </List>
                 </Grid>
             </Grid>
+            <Prompt
+                when={isSomethingChange}
+                message="Terdapat perubahan data yang belum disimpan, apakah Anda yakin ingin meninggalkan halaman ini?"
+            />
         </>
     );
 }
