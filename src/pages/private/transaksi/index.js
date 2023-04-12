@@ -26,6 +26,7 @@ import { useSnackbar } from "notistack";
 
 // page
 import AppPageLoading from "../../../components/AppPageLoading";
+import DetailsDialog from "./details";
 
 function Transaksi() {
     const firebase = useFirebase();
@@ -62,6 +63,24 @@ function Transaksi() {
         }
     }
 
+    const [details, setDetails] = useState({
+        open: false,
+        transaksi: {}
+    });
+
+    const handleCloseDetails = (e) => {
+        setDetails({
+            open: false,
+            transaksi: {}
+        })
+    }
+
+    const handleOpenDetails = transaksiDoc => (e) => {
+        setDetails({
+            open: true,
+            transaksi: transaksiDoc.data()
+        })
+    }
 
     if (loading) {
         return (<AppPageLoading />);
@@ -119,6 +138,7 @@ function Transaksi() {
                                         style={styles.transaksiActions}
                                     >
                                         <IconButton
+                                            onClick={handleOpenDetails(transaksiDoc)}
                                             disabled={isSubmitting}
                                         >
                                             <ViewIcon />
@@ -139,6 +159,11 @@ function Transaksi() {
             <Prompt
                 when={isSomethingChange}
                 message="Terdapat perubahan data yang belum disimpan, apakah Anda yakin ingin meninggalkan halaman ini?"
+            />
+            <DetailsDialog
+                open={details.open}
+                handleClose={handleCloseDetails}
+                transaksi={details.transaksi}
             />
         </>
     );
