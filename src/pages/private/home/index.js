@@ -186,7 +186,7 @@ function Home() {
                             await runTransaction(firebase.firestore, async (transaction) => {
                                 const produkDoc = await transaction.get(produkRef);
                                 if (!produkDoc.exists()) {
-                                    throw "Produk tidak ada!";
+                                    throw new Error("Produk tidak ada!");
                                 }
 
                                 let newStok = parseInt(produkDoc.data().stok) - parseInt(transaksi.items[produkId].jumlah);
