@@ -78,11 +78,11 @@ function EditProduk({ match }) {
             newError.nama = 'Nama Produk wajib diisi';
         }
 
-        if (!form.harga || form.harga == 0) {
+        if (!form.harga || form.harga === 0) {
             newError.harga = "Harga Produk wajib diisi atau tidak boleh \"0\"";
         }
 
-        if (!form.stok || form.harga == 0) {
+        if (!form.stok || form.harga === 0) {
             newError.stok = "Stok Produk wajib diisi atau tidak boleh \"0\"";
         }
 
