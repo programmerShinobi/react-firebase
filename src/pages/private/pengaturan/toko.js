@@ -135,7 +135,7 @@ function Toko() {
                     name="nama"
                     label="Nama Toko"
                     margin="normal"
-                    value={form.nama}
+                    value={form?.nama}
                     onChange={handleChange}
                     helperText={error.nama}
                     error={error.nama ? true : false}
@@ -151,7 +151,7 @@ function Toko() {
                     margin="normal"
                     multiline
                     maxRows={3}
-                    value={form.alamat}
+                    value={form?.alamat}
                     onChange={handleChange}
                     helperText={error.alamat}
                     error={error.alamat ? true : false}
@@ -165,7 +165,7 @@ function Toko() {
                     name="telepon"
                     label="No Telepon Toko"
                     margin="normal"
-                    value={form.telepon}
+                    value={form?.telepon}
                     onChange={handleChange}
                     helperText={error.telepon}
                     error={error.telepon ? true : false}
@@ -179,7 +179,7 @@ function Toko() {
                     name="website"
                     label="Website Toko"
                     margin="normal"
-                    value={form.website}
+                    value={form?.website}
                     onChange={handleChange}
                     helperText={error.website}
                     error={error.website ? true : false}
